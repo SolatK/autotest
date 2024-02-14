@@ -16,14 +16,12 @@ public class RedButtonTest {
     public void userCanSearch() {
         WebDriver driver = new FirefoxDriver();
         WebDriverRunner.setWebDriver(driver);
+
         open("https://google.com");
+
         new GooglePage().searchFor("перфоманс лаб");
-
         SearchResultsPage results = new SearchResultsPage();
-
         results.getResults().shouldHave(text("https://www.performance-lab.ru"));
-
-
 
         try {
             driver.manage().timeouts().pageLoadTimeout(2, TimeUnit.SECONDS);//страница никогда не загрузится, нужен таймаут
@@ -34,10 +32,10 @@ public class RedButtonTest {
         }
 
         PerfomanceLabPage perfomanceLabPage = new PerfomanceLabPage();
-
         perfomanceLabPage.hoverOnMenu();
         perfomanceLabPage.clickAutoTestLink();
         perfomanceLabPage.checkButtonIsRed();
+
         closeWindow();
     }
 }
