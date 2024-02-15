@@ -66,6 +66,10 @@ public class RedButtonTest {
 
         PerformanceLabMainPage performanceLabMainPage = new PerformanceLabMainPage();
         performanceLabMainPage.hoverOnMenu();
+
+        //открылось ли выпадающее меню
+        $("#mega-menu-item-317 > a:nth-child(1)").shouldHave(attribute("aria-expanded", "true"));
+
         performanceLabMainPage.clickAutoTestLink();
     }
 

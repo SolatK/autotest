@@ -6,7 +6,6 @@ import static com.codeborne.selenide.Selenide.$;
 public class PerformanceLabMainPage {
     public void hoverOnMenu() {
         $("#mega-menu-item-317 > a:nth-child(1) > span:nth-child(1)").hover();
-        $("#mega-menu-item-317 > a:nth-child(1)").shouldHave(attribute("aria-expanded", "true"));
     }
 
     public void clickAutoTestLink() {
