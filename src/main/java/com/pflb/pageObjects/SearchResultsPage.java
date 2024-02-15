@@ -5,6 +5,6 @@ import static com.codeborne.selenide.Selenide.*;
 
 public class SearchResultsPage {
     public SelenideElement getResults() {
-        return $("html div#search");
+        return $("#rso");
     }
 }
