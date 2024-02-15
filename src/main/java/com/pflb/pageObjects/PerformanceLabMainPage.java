@@ -1,8 +1,7 @@
-package com.pflb.redButton.pageObjects;
+package com.pflb.pageObjects;
 
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Selenide.$;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class PerformanceLabMainPage {
     public void hoverOnMenu() {

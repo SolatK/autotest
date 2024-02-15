@@ -1,4 +1,4 @@
-package com.pflb.redButton.pageObjects;
+package com.pflb.pageObjects;
 
 import org.openqa.selenium.By;
 
