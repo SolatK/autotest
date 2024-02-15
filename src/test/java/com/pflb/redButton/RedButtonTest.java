@@ -1,83 +1,84 @@
 package com.pflb.redButton;
 
+import com.codeborne.selenide.ClickOptions;
+import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
+import com.codeborne.selenide.ex.UIAssertionError;
 import com.pflb.pageObjects.GooglePage;
 import com.pflb.pageObjects.PerformanceLabAutotestPage;
 import com.pflb.pageObjects.PerformanceLabMainPage;
 import com.pflb.pageObjects.SearchResultsPage;
 import io.qameta.allure.Step;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.junit.jupiter.api.Assertions;
+import org.openqa.selenium.net.UrlChecker;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
 
+
 public class RedButtonTest {
+    @DisplayName("Тест на красную кнопку")
     @Test
     public void isButtonRed() {
         WebDriver driver = new FirefoxDriver();
         WebDriverRunner.setWebDriver(driver);
 
         //step 1
-        openGoogleAndSearch();
-
-        driver
-                .manage()
-                .timeouts()
-                .pageLoadTimeout(2, TimeUnit.SECONDS);//страница никогда не загрузится, нужен таймаут
+        SelenideElement searchResult = openGoogleAndSearch("Перфоманс лаб");
+        searchResult.shouldHave(text("https://www.performance-lab.ru"));
 
         //step 2
-        openPerformanceLabPage();
-
-        driver
-                .manage()
-                .timeouts()
-                .pageLoadTimeout(30, TimeUnit.SECONDS);//30 секунд обратно
+        clickLinkFromGoogle(searchResult, "div>div>div>div>div>div>div>div>span>a");//селектор первой ссылки в гугле
 
         //step 3
-        checkButtonColor();
+        clickAutotestPage();
+
+        //step 4
+        Assertions.assertEquals("rgb(255, 89, 89)", getButtonColor());
     }
 
-    @Step("Step 1. Search in google.com and check results")
-    public void openGoogleAndSearch() {
+    @Step("Search in google.com and check results")
+    public SelenideElement openGoogleAndSearch(String needle) {
         open("https://google.com");
-
-        new GooglePage().searchFor("перфоманс лаб");
-        SearchResultsPage results = new SearchResultsPage();
-
-        results
-                .getResults()
-                .shouldHave(text("https://www.performance-lab.ru"));
+        new GooglePage().searchFor(needle);
+        return new SearchResultsPage().getResults();
     }
 
-    @Step("Step 2. Open site and page")
-    public void openPerformanceLabPage() {
+    @Step("Open site and page")
+    public void clickLinkFromGoogle(SelenideElement searchResult, String selector) {
         try {
-            open("https://www.performance-lab.ru/");//с click() так почему-то не работает
-        } catch (TimeoutException ignore) {
+            searchResult
+                    .find(selector)
+                    .click(
+                            ClickOptions.withTimeout(Duration.ofSeconds(2))//таймаут так как страница никогда не загрузится
+                    );
+        } catch (UIAssertionError ignore) {
             //инор таймаута так как страница не грузится из-за мусора
         }
+    }
 
+    @Step("Click autotest link")
+    public void clickAutotestPage() {
         PerformanceLabMainPage performanceLabMainPage = new PerformanceLabMainPage();
         performanceLabMainPage.hoverOnMenu();
 
-        //открылось ли выпадающее меню
+        //ждем открытия меню перед кликом
         $("#mega-menu-item-317 > a:nth-child(1)").shouldHave(attribute("aria-expanded", "true"));
 
         performanceLabMainPage.clickAutoTestLink();
     }
 
-    @Step("Step 3. Check button color")
-    public void checkButtonColor() {
+
+    @Step("Get button color")
+    public String getButtonColor() {
         PerformanceLabAutotestPage performanceLabAutotestPage = new PerformanceLabAutotestPage();
-        String buttonColor = performanceLabAutotestPage.getButtonColor();
-        Assertions.assertEquals("rgb(255, 89, 89)", buttonColor);
+        return performanceLabAutotestPage.getButtonColor();
     }
 
     @AfterAll
